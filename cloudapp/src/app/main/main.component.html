@@ -1,0 +1,83 @@
+<div class="eca-actions">
+  <input type="text" [(ngModel)]="setID" placeholder="Enter Set ID" />
+  <button (click)="fetchSet(setID)"> Retrieve Set Members</button>
+</div>
+
+<!-- Add update button when users are loaded -->
+<div class="eca-actions" *ngIf="users && users.length > 0 && !loading">
+  <button (click)="bulkUpdateLanguage()" [disabled]="updating">
+    Update All to Spanish
+  </button>
+  <span *ngIf="updateSummary" class="update-summary">
+    {{ updateSummary }}
+  </span>
+</div>
+
+<div>
+  <!-- Show user details when available -->
+  <section *ngIf="users && users.length > 0" style="margin-top: 50px;">
+    <h2 style="color: green">User Details</h2>
+    <div *ngFor="let user of users" class="user-card">
+      <h3>{{ user.full_name || user.first_name + ' ' + user.last_name || 'User ' + user.id }}</h3>
+      
+      <!-- Show error if there was an error fetching this user -->
+      <div *ngIf="user.error" class="error-message">
+        {{ user.error }}
+      </div>
+      
+      <!-- Show update status if available -->
+      <div *ngIf="user.updateStatus" [ngClass]="user.updateStatus === 'success' ? 'success-message' : 'error-message'">
+        {{ user.updateStatus === 'success' ? 'Language updated to Spanish!' : 'Failed to update language: ' + user.updateError }}
+      </div>
+      
+      <!-- Show user details if available -->
+      <div *ngIf="!user.error" class="user-details">
+        <p><strong>ID:</strong> {{ user.primary_id }}</p>
+        <p><strong>Preferred Language:</strong> 
+          <span [class.highlight]="user.updateStatus === 'success'">
+            {{ user.preferred_language?.desc || 'N/A' }}
+          </span>
+        </p>
+        
+        <!-- Expandable section for full user object -->
+        <details>
+          <summary>More details</summary>
+          <pre>{{ user | json }}</pre>
+        </details>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Show basic set member info -->
+  <section *ngIf="members && members.length > 0 && (!users || users.length === 0)" style="margin-top: 50px;">
+    <h2 style="color: blue">Set Members</h2>
+    <ul style="padding: 10px">
+      <li style="margin: 5px 0" *ngFor="let member of members">
+        <strong>Name:</strong> {{ member.name }} | 
+        <strong>Id:</strong> {{ member.id }} | 
+        <strong>Description:</strong> {{ member.description }} | 
+        <strong>Link:</strong> <a href="{{member.link}}" target="_blank">{{member.link}}</a>
+      </li>
+    </ul>
+  </section>
+  
+  <!-- Show empty list template when nothing is available -->
+  <section *ngIf="(!members || members.length === 0) && !loading && setID" style="margin-top: 50px;">
+    <ng-container *ngTemplateOutlet="emptyList"></ng-container>
+  </section>
+  
+  <!-- Show loading indicator when loading -->
+  <section *ngIf="loading || updating" style="margin-top: 50px;">
+    <div class="loading-indicator">
+      <span>{{ updating ? 'Updating languages...' : 'Loading data...' }}</span>
+    </div>
+  </section>
+</div>
+
+<!-- Empty list template -->
+<ng-template #emptyList>
+  <div id="emptyList">
+    <span class="uxf-icon uxf-list" style="font-size: 3em;"></span>
+    <div>No items found for this set.</div>
+  </div>
+</ng-template>
