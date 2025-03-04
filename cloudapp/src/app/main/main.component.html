@@ -5,9 +5,21 @@
 
 <!-- Add update button when users are loaded -->
 <div class="eca-actions" *ngIf="users && users.length > 0 && !loading">
+  <div class="language-selection">
+    <label for="language-select">Select Language: </label>
+    <select id="language-select" [(ngModel)]="selectedLanguage">
+      <option *ngFor="let lang of languageOptions" [ngValue]="lang">{{ lang.desc }}</option>
+    </select>
+  </div>
+  
   <button (click)="bulkUpdateLanguage()" [disabled]="updating">
-    Update All to Spanish
+    Update All to {{ selectedLanguage.desc }}
   </button>
+
+</div>
+
+<div class="member-count" *ngIf="members && members.length > 0" style="display: flex; justify-content: space-between;">
+  <span>Total set members: {{ members.length }}</span>
   <span *ngIf="updateSummary" class="update-summary">
     {{ updateSummary }}
   </span>
@@ -27,7 +39,7 @@
       
       <!-- Show update status if available -->
       <div *ngIf="user.updateStatus" [ngClass]="user.updateStatus === 'success' ? 'success-message' : 'error-message'">
-        {{ user.updateStatus === 'success' ? 'Language updated to Spanish!' : 'Failed to update language: ' + user.updateError }}
+        {{ user.updateStatus === 'success' ? 'Language updated to ' + selectedLanguage.desc + '!' : 'Failed to update language: ' + user.updateError }}
       </div>
       
       <!-- Show user details if available -->

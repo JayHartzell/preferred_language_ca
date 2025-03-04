@@ -28,6 +28,13 @@ export class MainComponent implements OnInit, OnDestroy {
   setID: string = '';
   private setMembers: Array<{ id: number, name: string, description: string, link: string }> = [];
   userDetails: Array<any> = [];
+  
+  // Add language options
+  languageOptions = [
+    { value: 'es', desc: 'Spanish' },
+    { value: 'en', desc: 'English' }
+  ];
+  selectedLanguage = this.languageOptions[0]; // Default to Spanish
 
   constructor(
     private restService: CloudAppRestService,
@@ -56,47 +63,69 @@ export class MainComponent implements OnInit, OnDestroy {
     this.setID = setID;
     this.loading = true;
     this.userDetails = [];
+    this.setMembers = [];
     
-    this.restService.call(`/conf/sets/${this.setID}/members`).pipe(
+    // Start with first page, will fetch all pages
+    this.fetchSetMembersPage(setID, 0);
+  }
+  
+  fetchSetMembersPage(setID: string, offset: number, allMembers: any[] = []) {
+    // Use limit=100 to get more members per page, offset for pagination
+    this.restService.call(`/conf/sets/${setID}/members?limit=100&offset=${offset}`).pipe(
       finalize(() => {
-        // We'll set loading to false after all user details are fetched
+        // Only complete loading when we've fetched all pages
+        if (!this.loading) {
+          this.fetchUserDetailsForMembers();
+        }
       })
     ).subscribe({
       next: (response) => {
-        this.apiResult = response;
-        
         if (Array.isArray(response.member)) {
-          this.setMembers = response.member.map((member: any) => ({
+          const currentPageMembers = response.member.map((member: any) => ({
             id: member.id,
             name: member.name,
             description: member.description,
             link: member.link
           }));
           
-          console.log('Set members:', this.setMembers);
+          // Add current page members to our collection
+          const updatedMembers = [...allMembers, ...currentPageMembers];
+          this.setMembers = updatedMembers;
           
-          // Fetch user details for each member
-          this.fetchUserDetailsForMembers();
+          console.log(`Fetched ${currentPageMembers.length} members, total now: ${updatedMembers.length}`);
+          
+          // Check if we need to fetch more pages
+          if (response.member.length === 100) {
+            // If we got a full page, there might be more - fetch next page
+            console.log(`Fetching next page, offset: ${offset + 100}`);
+            this.fetchSetMembersPage(setID, offset + 100, updatedMembers);
+          } else {
+            // We've fetched all pages
+            console.log(`All set members fetched: ${updatedMembers.length} total`);
+            this.loading = false;
+          }
         } else {
-          this.setMembers = [];
+          this.setMembers = allMembers; // Use what we have so far
           this.loading = false;
           console.error('Expected response.member to be an array, but got:', response.member);
         }
       },
       error: (error) => {
-        this.setMembers = [];
+        this.setMembers = allMembers; // Use what we have so far
         this.loading = false;
-        this.alert.error('Failed to fetch set members');
+        this.alert.error(`Failed to fetch set members page (offset ${offset})`);
         console.error('Error fetching set members:', error);
       }
     });
   }
-  
+
   fetchUserDetailsForMembers() {
     if (this.setMembers.length === 0) {
       this.loading = false;
       return;
     }
+    
+    console.log(`Fetching user details for ${this.setMembers.length} members`);
     
     // Create an array of observables for each user request
     const userRequests = this.setMembers.map(member => 
@@ -114,7 +143,7 @@ export class MainComponent implements OnInit, OnDestroy {
       finalize(() => this.loading = false)
     ).subscribe({
       next: (usersArray) => {
-        console.log('All user details:', usersArray);
+        console.log(`Received details for ${usersArray.length} users`);
         this.userDetails = usersArray;
       },
       error: (error) => {
@@ -152,10 +181,10 @@ export class MainComponent implements OnInit, OnDestroy {
       // Create a copy of the user object
       const updatedUser = { ...user };
       
-      // Update the preferred language
+      // Update the preferred language with selected language
       updatedUser.preferred_language = {
-        value: "es",
-        desc: "Spanish"
+        value: this.selectedLanguage.value,
+        desc: this.selectedLanguage.desc
       };
       
       // Return the update observable
@@ -195,7 +224,7 @@ export class MainComponent implements OnInit, OnDestroy {
     ).subscribe({
       next: results => {
         console.log('Bulk update completed:', results);
-        this.alert.success(`Updated ${results.length} users to Spanish language`);
+        this.alert.success(`Updated ${results.length} users to ${this.selectedLanguage.desc} language`);
       },
       error: error => {
         console.error('Error in bulk update:', error);
