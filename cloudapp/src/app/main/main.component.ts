@@ -9,7 +9,14 @@ import {
 } from '@exlibris/exl-cloudapp-angular-lib';
 import { forkJoin, Observable, of } from 'rxjs';
 import { finalize, tap, catchError } from 'rxjs/operators';
-
+interface LogEntry {
+  userId: string;
+  userName: string;
+  status: 'success' | 'error';
+  language: string;
+  message: string;
+  timestamp: Date;
+}
 @Component({
   selector: 'app-main',
   templateUrl: './main.component.html',
@@ -35,6 +42,12 @@ export class MainComponent implements OnInit, OnDestroy {
     { value: 'en', desc: 'English' }
   ];
   selectedLanguage = this.languageOptions[0]; // Default to Spanish
+
+  // Define a type for log entries
+ 
+
+  // Add to your component properties
+  updateLog: LogEntry[] = [];
 
   constructor(
     private restService: CloudAppRestService,
@@ -166,6 +179,8 @@ export class MainComponent implements OnInit, OnDestroy {
     
     this.updating = true;
     this.updateSummary = '';
+      // Clear previous log entries
+    this.updateLog = [];
     
     // Filter out users that had errors during fetch
     const validUsers = this.userDetails.filter(user => !user.error);
@@ -197,6 +212,7 @@ export class MainComponent implements OnInit, OnDestroy {
             Object.assign(userToUpdate, result);
             userToUpdate.updateStatus = 'success';
           }
+          this.logUpdateResult(user, 'success', 'Language updated successfully');
         }),
         catchError(error => {
           // Find the user in our array and update with error status
@@ -206,6 +222,7 @@ export class MainComponent implements OnInit, OnDestroy {
             userToUpdate.updateError = error.message || 'Unknown error';
           }
           console.error(`Error updating user ${user.primary_id}:`, error);
+          this.logUpdateResult(user, 'error', error.message || 'Unknown error');
           // Return a placeholder to continue with other requests
           return of({ primary_id: user.primary_id, updateStatus: 'error' });
         })
@@ -220,6 +237,8 @@ export class MainComponent implements OnInit, OnDestroy {
         const successCount = this.userDetails.filter(user => user.updateStatus === 'success').length;
         const errorCount = this.userDetails.filter(user => user.updateStatus === 'error').length;
         this.updateSummary = `Updated: ${successCount} / Failed: ${errorCount}`;
+        // Debug log
+  console.log(`Update log has ${this.updateLog.length} entries`);
       })
     ).subscribe({
       next: results => {
@@ -243,6 +262,68 @@ export class MainComponent implements OnInit, OnDestroy {
     };
     
     return this.restService.call(request);
+  }
+
+  private logUpdateResult(user: any, status: 'success' | 'error', message: string) {
+    console.log('Logging update result:', user?.primary_id || user?.id, status);
+    
+    if (!user) {
+      console.error('Missing user object in logUpdateResult');
+      return;
+    }
+    
+    this.updateLog.push({
+      userId: user.primary_id || user.id || 'unknown',
+      userName: user.full_name || `${user.first_name || ''} ${user.last_name || ''}`.trim() || 'Unknown',
+      status: status,
+      language: this.selectedLanguage?.desc || 'Unknown',
+      message: message,
+      timestamp: new Date()
+    });
+    
+    console.log(`Log entry added. Current log size: ${this.updateLog.length}`);
+  }
+
+  exportLogAsCSV() {
+    // CSV header
+    const header = ['User ID', 'Name', 'Status', 'Language', 'Message', 'Timestamp'];
+    
+    // Convert log data to CSV rows
+    const rows = this.updateLog.map(entry => [
+      entry.userId,
+      entry.userName,
+      entry.status,
+      entry.language,
+      entry.message,
+      new Date(entry.timestamp).toLocaleString()
+    ]);
+    
+    // Combine header and rows
+    const csvContent = [
+      header.join(','),
+      ...rows.map(row => row.map(cell => 
+        // Escape quotes and wrap in quotes if contains comma or quotes
+        cell.toString().includes(',') || cell.toString().includes('"') 
+          ? `"${cell.toString().replace(/"/g, '""')}"` 
+          : cell
+      ).join(','))
+    ].join('\n');
+    
+    // Create download link
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    
+    // Set file name with date
+    const date = new Date().toISOString().split('T')[0];
+    link.setAttribute('href', url);
+    link.setAttribute('download', `language-update-log-${date}.csv`);
+    link.style.visibility = 'hidden';
+    
+    // Trigger download
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   }
 
   get members() {

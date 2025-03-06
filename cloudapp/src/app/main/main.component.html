@@ -15,7 +15,6 @@
   <button (click)="bulkUpdateLanguage()" [disabled]="updating">
     Update All to {{ selectedLanguage.desc }}
   </button>
-
 </div>
 
 <div class="member-count" *ngIf="members && members.length > 0" style="display: flex; justify-content: space-between;">
@@ -25,6 +24,38 @@
   </span>
 </div>
 
+<!-- Add update log section -->
+<div *ngIf="updateLog && updateLog.length > 0" class="update-log-section">
+  <div class="log-header" style="display: flex; justify-content: space-between; align-items: center; margin: 20px 0 10px 0;">
+    <h3>Update Results Log</h3>
+    <button (click)="exportLogAsCSV()" class="export-button">
+      <i class="uxf-icon uxf-download"></i> Export as CSV
+    </button>
+  </div>
+  
+  <table class="update-log-table" style="width: 100%; border-collapse: collapse;">
+    <thead>
+      <tr>
+        <th>User ID</th>
+        <th>Name</th>
+        <th>Status</th>
+        <th>Language</th>
+        <th>Message</th>
+        <th>Timestamp</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let entry of updateLog" [ngClass]="{'success-row': entry.status === 'success', 'error-row': entry.status === 'error'}">
+        <td>{{ entry.userId }}</td>
+        <td>{{ entry.userName }}</td>
+        <td>{{ entry.status }}</td>
+        <td>{{ entry.language }}</td>
+        <td>{{ entry.message }}</td>
+        <td>{{ entry.timestamp | date:'short' }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 <div>
   <!-- Show user details when available -->
   <section *ngIf="users && users.length > 0" style="margin-top: 50px;">
