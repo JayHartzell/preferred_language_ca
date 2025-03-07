@@ -104,6 +104,9 @@ details pre {
 .update-summary {
   margin-left: 15px;
   font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .highlight {
@@ -182,5 +185,20 @@ details pre {
   
   &:hover {
     background-color: #45a049;
+  }
+}
+
+.copy-button {
+  background-color: #3498db;
+  color: white;
+  padding: 4px 8px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9em;
+  margin-left: 10px;
+  
+  &:hover {
+    background-color: #2980b9;
   }
 }

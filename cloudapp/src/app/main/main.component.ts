@@ -7,8 +7,10 @@ import {
   HttpMethod,
   Request
 } from '@exlibris/exl-cloudapp-angular-lib';
-import { forkJoin, Observable, of } from 'rxjs';
+import { forkJoin, Observable, of, Subscription } from 'rxjs';
 import { finalize, tap, catchError } from 'rxjs/operators';
+import { DomSanitizer } from '@angular/platform-browser';
+
 interface LogEntry {
   userId: string;
   userName: string;
@@ -17,6 +19,7 @@ interface LogEntry {
   message: string;
   timestamp: Date;
 }
+
 @Component({
   selector: 'app-main',
   templateUrl: './main.component.html',
@@ -39,29 +42,46 @@ export class MainComponent implements OnInit, OnDestroy {
   // Add language options
   languageOptions = [
     { value: 'es', desc: 'Spanish' },
-    { value: 'en', desc: 'English' }
+    { value: 'en', desc: 'English' },
+    { value: 'fr', desc: 'French' },
+    { value: 'de', desc: 'German' },
+    { value: 'it', desc: 'Italian' },
+    { value: 'he', desc: 'Hebrew' },
+    { value: 'ar', desc: 'Arabic' },
+    { value: 'no', desc: 'Norwegian' }
   ];
   selectedLanguage = this.languageOptions[0]; // Default to Spanish
-
-  // Define a type for log entries
- 
 
   // Add to your component properties
   updateLog: LogEntry[] = [];
 
+  // Add session monitoring
+  private sessionSubscription!: Subscription;
+  private readonly SESSION_TIMEOUT = 30 * 60 * 1000; // 30 minutes
+
   constructor(
     private restService: CloudAppRestService,
     private eventsService: CloudAppEventsService,
-    private alert: AlertService
+    private alert: AlertService,
+    private sanitizer: DomSanitizer
   ) {
     this.entities$ = this.eventsService.entities$.pipe(tap(() => this.clear()));
   }
 
   ngOnInit() {
-   
+    // Monitor for session activity
+    this.sessionSubscription = this.eventsService.getAuthToken().subscribe({
+      error: () => {
+        this.alert.error('Your session has expired. Please refresh the page to login again.');
+      }
+    });
   }
 
   ngOnDestroy(): void {
+    // Clean up subscriptions to prevent memory leaks
+    if (this.sessionSubscription) {
+      this.sessionSubscription.unsubscribe();
+    }
   }
 
   clear() {
@@ -73,13 +93,24 @@ export class MainComponent implements OnInit, OnDestroy {
   }
 
   fetchSet(setID: string) {
-    this.setID = setID;
+    // Input validation
+    if (!setID || !this.isValidSetId(setID)) {
+      this.alert.error('Please provide a valid Set ID');
+      return;
+    }
+
+    // Sanitize input (though Angular's binding should handle most sanitization)
+    const sanitizedSetID = this.sanitizeInput(setID);
+    
+    this.setID = sanitizedSetID;
     this.loading = true;
     this.userDetails = [];
     this.setMembers = [];
+    this.updateLog = [];
+    this.updateSummary = '';
     
     // Start with first page, will fetch all pages
-    this.fetchSetMembersPage(setID, 0);
+    this.fetchSetMembersPage(sanitizedSetID, 0);
   }
   
   fetchSetMembersPage(setID: string, offset: number, allMembers: any[] = []) {
@@ -105,29 +136,23 @@ export class MainComponent implements OnInit, OnDestroy {
           const updatedMembers = [...allMembers, ...currentPageMembers];
           this.setMembers = updatedMembers;
           
-          console.log(`Fetched ${currentPageMembers.length} members, total now: ${updatedMembers.length}`);
-          
           // Check if we need to fetch more pages
           if (response.member.length === 100) {
             // If we got a full page, there might be more - fetch next page
-            console.log(`Fetching next page, offset: ${offset + 100}`);
             this.fetchSetMembersPage(setID, offset + 100, updatedMembers);
           } else {
             // We've fetched all pages
-            console.log(`All set members fetched: ${updatedMembers.length} total`);
             this.loading = false;
           }
         } else {
           this.setMembers = allMembers; // Use what we have so far
           this.loading = false;
-          console.error('Expected response.member to be an array, but got:', response.member);
         }
       },
       error: (error) => {
         this.setMembers = allMembers; // Use what we have so far
         this.loading = false;
         this.alert.error(`Failed to fetch set members page (offset ${offset})`);
-        console.error('Error fetching set members:', error);
       }
     });
   }
@@ -138,13 +163,10 @@ export class MainComponent implements OnInit, OnDestroy {
       return;
     }
     
-    console.log(`Fetching user details for ${this.setMembers.length} members`);
-    
     // Create an array of observables for each user request
     const userRequests = this.setMembers.map(member => 
       this.fetchUserDetails(member.id.toString()).pipe(
         catchError(error => {
-          console.error(`Error fetching user ${member.id}:`, error);
           // Return a placeholder on error so forkJoin doesn't fail completely
           return of({ id: member.id, error: 'Failed to load user details' });
         })
@@ -156,18 +178,15 @@ export class MainComponent implements OnInit, OnDestroy {
       finalize(() => this.loading = false)
     ).subscribe({
       next: (usersArray) => {
-        console.log(`Received details for ${usersArray.length} users`);
         this.userDetails = usersArray;
       },
       error: (error) => {
-        console.error('Error in user details batch request:', error);
         this.alert.error('Failed to fetch some user details');
       }
     });
   }
   
   fetchUserDetails(userId: string): Observable<any> {
-    console.log(`Fetching details for user: ${userId}`);
     return this.restService.call(`/users/${userId}`);
   }
   
@@ -179,7 +198,7 @@ export class MainComponent implements OnInit, OnDestroy {
     
     this.updating = true;
     this.updateSummary = '';
-      // Clear previous log entries
+    // Clear previous log entries
     this.updateLog = [];
     
     // Filter out users that had errors during fetch
@@ -221,7 +240,6 @@ export class MainComponent implements OnInit, OnDestroy {
             userToUpdate.updateStatus = 'error';
             userToUpdate.updateError = error.message || 'Unknown error';
           }
-          console.error(`Error updating user ${user.primary_id}:`, error);
           this.logUpdateResult(user, 'error', error.message || 'Unknown error');
           // Return a placeholder to continue with other requests
           return of({ primary_id: user.primary_id, updateStatus: 'error' });
@@ -237,24 +255,18 @@ export class MainComponent implements OnInit, OnDestroy {
         const successCount = this.userDetails.filter(user => user.updateStatus === 'success').length;
         const errorCount = this.userDetails.filter(user => user.updateStatus === 'error').length;
         this.updateSummary = `Updated: ${successCount} / Failed: ${errorCount}`;
-        // Debug log
-  console.log(`Update log has ${this.updateLog.length} entries`);
       })
     ).subscribe({
       next: results => {
-        console.log('Bulk update completed:', results);
         this.alert.success(`Updated ${results.length} users to ${this.selectedLanguage.desc} language`);
       },
       error: error => {
-        console.error('Error in bulk update:', error);
         this.alert.error('Failed to complete bulk update');
       }
     });
   }
   
   updateUserLanguage(userId: string, updatedUser: any): Observable<any> {
-    console.log(`Updating language for user: ${userId}`);
-    
     const request: Request = {
       url: `/users/${userId}`,
       method: HttpMethod.PUT,
@@ -265,10 +277,7 @@ export class MainComponent implements OnInit, OnDestroy {
   }
 
   private logUpdateResult(user: any, status: 'success' | 'error', message: string) {
-    console.log('Logging update result:', user?.primary_id || user?.id, status);
-    
     if (!user) {
-      console.error('Missing user object in logUpdateResult');
       return;
     }
     
@@ -280,50 +289,45 @@ export class MainComponent implements OnInit, OnDestroy {
       message: message,
       timestamp: new Date()
     });
-    
-    console.log(`Log entry added. Current log size: ${this.updateLog.length}`);
   }
 
-  exportLogAsCSV() {
-    // CSV header
-    const header = ['User ID', 'Name', 'Status', 'Language', 'Message', 'Timestamp'];
+  copyLogToClipboard() {
+    // Ensure we're only copying necessary data
+    const header = ['User ID', 'Status', 'Language', 'Timestamp'];
     
-    // Convert log data to CSV rows
+    // Limit the data exposed in clipboard copy
     const rows = this.updateLog.map(entry => [
       entry.userId,
-      entry.userName,
       entry.status,
       entry.language,
-      entry.message,
       new Date(entry.timestamp).toLocaleString()
     ]);
     
     // Combine header and rows
     const csvContent = [
-      header.join(','),
-      ...rows.map(row => row.map(cell => 
-        // Escape quotes and wrap in quotes if contains comma or quotes
-        cell.toString().includes(',') || cell.toString().includes('"') 
-          ? `"${cell.toString().replace(/"/g, '""')}"` 
-          : cell
-      ).join(','))
+      header.join('\t'),
+      ...rows.map(row => row.join('\t'))
     ].join('\n');
     
-    // Create download link
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    
-    // Set file name with date
-    const date = new Date().toISOString().split('T')[0];
-    link.setAttribute('href', url);
-    link.setAttribute('download', `language-update-log-${date}.csv`);
-    link.style.visibility = 'hidden';
-    
-    // Trigger download
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    // Copy to clipboard
+    navigator.clipboard.writeText(csvContent)
+      .then(() => {
+        this.alert.success('Update log copied to clipboard!');
+      })
+      .catch(err => {
+        this.alert.error('Failed to copy to clipboard.');
+      });
+  }
+
+  // Input validation helper 
+  private isValidSetId(id: string): boolean {
+    // validation for numeric set IDs 
+    return /^\d{12,18}$/.test(id);
+  }
+  
+  // Basic sanitization
+  private sanitizeInput(input: string): string {
+    return input.trim();
   }
 
   get members() {
