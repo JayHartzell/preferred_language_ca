@@ -28,6 +28,8 @@ If you need to document the changes made:
 
 
 ### Resources
-[Adding Support for Additional Languages](https://ccclibraries.com/c.php?g=1153372&p=10353464)
-[What are the relations between Institutional Languages and Preferred Languages](https://knowledge.exlibrisgroup.com/Alma/Knowledge_Articles/What_are_the_relations_between_Institution_Languages_and_Preferred_Languages%3F#:~:text=In%20Alma%20you%20can%20set,dropdown%20list%20under%20Preferred%20Language.)
+[Adding Support for Additional Languages](https://ccclibraries.com/c.php?g=1153372&p=10353464)<br>
+
+[What are the relations between Institutional Languages and Preferred Languages](https://knowledge.exlibrisgroup.com/Alma/Knowledge_Articles/What_are_the_relations_between_Institution_Languages_and_Preferred_Languages%3F#:~:text=In%20Alma%20you%20can%20set,dropdown%20list%20under%20Preferred%20Language.)<br>
+
 [Configuring Institutional Languages](https://knowledge.exlibrisgroup.com/Alma/Product_Documentation/010Alma_Online_Help_(English)/050Administration/050Configuring_General_Alma_Functions/090Configuring_Institution_Languages)
