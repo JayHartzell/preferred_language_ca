@@ -20,10 +20,6 @@ This app allows you to retrieve sets of users and update their preferred languag
 3. Click the "Update All" button to change all users' preferred language to the selected option.
 5. Once complete, a summary will show the number of successful and failed updates.
 
-A summary count appears at the top showing:
-- Total members in the set
-- Number of successful/failed updates
-
 ### Exporting Results
 If you need to document the changes made:
 1. After performing updates, a "Copy Results to Clipboard" button will appear.
