@@ -1,6 +1,7 @@
 {
    "id": "preferred-language-utility",
-   "title": "preferred_language_utility",
-   "subtitle": "pref lang bulk updates",
-   "author": "jay hartzell"
+   "title": "Preferred Language Updater",
+   "subtitle": "User preferred language bulk update utility (beta)",
+   "author": "jay hartzell",
+   "description": "This utility takes in a set of users and updates their preferred language to a specified value."
 }

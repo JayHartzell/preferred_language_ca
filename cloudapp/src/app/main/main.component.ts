@@ -57,8 +57,7 @@ export class MainComponent implements OnInit, OnDestroy {
 
   // Add session monitoring
   private sessionSubscription!: Subscription;
-  private readonly SESSION_TIMEOUT = 30 * 60 * 1000; // 30 minutes
-
+  
   constructor(
     private restService: CloudAppRestService,
     private eventsService: CloudAppEventsService,
@@ -268,10 +267,11 @@ export class MainComponent implements OnInit, OnDestroy {
   
   updateUserLanguage(userId: string, updatedUser: any): Observable<any> {
     const request: Request = {
-      url: `/users/${userId}`,
+      url: `/users/${userId}?override=preferred_language`,
       method: HttpMethod.PUT,
       requestBody: updatedUser
     };
+    
     
     return this.restService.call(request);
   }

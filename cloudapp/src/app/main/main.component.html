@@ -57,7 +57,7 @@
         <!-- Expandable section for user details -->
         <details>
           <summary>User details</summary>
-          <p><strong>Status:</strong> {{ user.status }}</p>
+          <p><strong>Status:</strong> {{ user.status?.desc }}</p>
           <p><strong>User Group:</strong> {{ user.user_group?.desc || 'N/A' }}</p>
           <p><strong>Account Type:</strong> {{ user.account_type?.desc || 'N/A' }}</p>
           <pre>{{ user | json }}</pre>
