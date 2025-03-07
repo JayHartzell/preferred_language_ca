@@ -2,11 +2,6 @@
 
 This app allows you to retrieve sets of users and update their preferred language.
 
-## Features
-- Bulk update preferred language settings for multiple users simultaneously
-- Track success and failure of language update operations
-- Export update results to clipboard
-
 ## How to Use
 
 ### Retrieving a Set
