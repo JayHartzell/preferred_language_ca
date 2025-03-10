@@ -98,7 +98,6 @@ export class MainComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // Sanitize input (though Angular's binding should handle most sanitization)
     const sanitizedSetID = this.sanitizeInput(setID);
     
     this.setID = sanitizedSetID;
@@ -108,8 +107,29 @@ export class MainComponent implements OnInit, OnDestroy {
     this.updateLog = [];
     this.updateSummary = '';
     
-    // Start with first page, will fetch all pages
-    this.fetchSetMembersPage(sanitizedSetID, 0);
+    // First get set information
+    this.fetchSetInfo(sanitizedSetID).subscribe({
+      next: (setInfo) => {
+        // Check if the set contains users
+        if (!setInfo.content || setInfo.content.value !== 'USER') {
+          this.loading = false;
+          this.alert.error(`This set contains ${setInfo.content?.desc || 'unknown'} records. Only USER sets are supported.`);
+          return;
+        }
+        
+        // After getting set info, fetch the members
+        this.fetchSetMembersPage(sanitizedSetID, 0);
+      },
+      error: (error) => {
+        this.loading = false;
+        this.alert.error('Failed to retrieve set information');
+      }
+    });
+  }
+
+  fetchSetInfo(setID: string): Observable<any> {
+    // Call the conf/sets/{set_id} endpoint
+    return this.restService.call(`/conf/sets/${setID}`);
   }
   
   fetchSetMembersPage(setID: string, offset: number, allMembers: any[] = []) {
@@ -326,10 +346,11 @@ export class MainComponent implements OnInit, OnDestroy {
   }
   
   // Basic sanitization
+  // Comprehensive sanitization
   private sanitizeInput(input: string): string {
-    return input.trim();
+    // Trim the input and remove special characters
+    return input.trim().replace(/[^a-zA-Z0-9]/g, '');
   }
-
   get members() {
     return this.setMembers;
   }
