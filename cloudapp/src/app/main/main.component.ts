@@ -41,16 +41,46 @@ export class MainComponent implements OnInit, OnDestroy {
   
   // Add language options
   languageOptions = [
-    { value: 'es', desc: 'Spanish' },
-    { value: 'en', desc: 'English' },
-    { value: 'fr', desc: 'French' },
-    { value: 'de', desc: 'German' },
-    { value: 'it', desc: 'Italian' },
-    { value: 'he', desc: 'Hebrew' },
     { value: 'ar', desc: 'Arabic' },
-    { value: 'no', desc: 'Norwegian' }
-  ];
-  selectedLanguage = this.languageOptions[0]; // Default to Spanish
+    { value: 'eu', desc: 'Basque' },
+    { value: 'ca', desc: 'Catalan; Valencian' },
+    { value: 'zh', desc: 'Chinese' },
+    { value: 'cs', desc: 'Czech' },
+    { value: 'da', desc: 'Danish' },
+    { value: 'nl', desc: 'Dutch; Flemish' },
+    { value: 'en', desc: 'English' },
+    { value: 'fi', desc: 'Finnish' },
+    { value: 'fr', desc: 'French' },
+    { value: 'gl', desc: 'Galician' },
+    { value: 'de', desc: 'German' },
+    { value: 'haw', desc: 'Hawaiian' },
+    { value: 'he', desc: 'Hebrew' },
+    { value: 'hu', desc: 'Hungarian' },
+    { value: 'is', desc: 'Icelandic' },
+    { value: 'ga', desc: 'Irish' },
+    { value: 'it', desc: 'Italian' },
+    { value: 'ja', desc: 'Japanese' },
+    { value: 'ko', desc: 'Korean' },
+    { value: 'lt', desc: 'Lithuanian' },
+    { value: 'ms', desc: 'Malay' },
+    { value: 'nb', desc: 'Bokmål, Norwegian; Norwegian Bokmål' },
+    { value: 'no', desc: 'Norwegian' },
+    { value: 'se', desc: 'Northern Sami' },
+    { value: 'pl', desc: 'Polish' },
+    { value: 'pt', desc: 'Portuguese (Brazil)' },
+    { value: 'pt1', desc: 'Portuguese (Portugal)' },
+    { value: 'ru', desc: 'Russian' },
+    { value: 'es', desc: 'Spanish' },
+    { value: 'sv', desc: 'Swedish' },
+    { value: 'mi', desc: 'Te Reo Māori' },
+    { value: 'th', desc: 'Thai' },
+    { value: 'zh-tw', desc: 'Traditional Chinese' },
+    { value: 'tr', desc: 'Turkish' },
+    { value: 'uk', desc: 'Ukrainian' },
+    { value: 'cy', desc: 'Welsh' }
+];
+
+  selectedLanguage = this.languageOptions[29]; // Default to Spanish
 
   // Add to your component properties
   updateLog: LogEntry[] = [];

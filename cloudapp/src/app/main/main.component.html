@@ -4,17 +4,19 @@
 </div>
 
 <!-- Add update button when users are loaded -->
-<div class="eca-actions" *ngIf="users && users.length > 0 && !loading">
-  <div class="language-selection">
-    <label for="language-select">Select Language: </label>
-    <select id="language-select" [(ngModel)]="selectedLanguage">
+<div class="eca-actions" *ngIf="users && users.length > 0 && !loading" style="display: flex; flex-direction: column; gap: 10px;">
+  <div>
+    <label for="language-select" style="display: block; margin-bottom: 5px; font-weight: bold;">Select Language:</label>
+    <select id="language-select" [(ngModel)]="selectedLanguage" style="width: 300px; max-width: 100%;">
       <option *ngFor="let lang of languageOptions" [ngValue]="lang">{{ lang.desc }}</option>
     </select>
   </div>
   
-  <button (click)="bulkUpdateLanguage()" [disabled]="updating">
-    Update All to {{ selectedLanguage.desc }}
-  </button>
+  <div>
+    <button (click)="bulkUpdateLanguage()" [disabled]="updating" style="margin-top: 5px;">
+      Update All to {{ selectedLanguage.desc }}
+    </button>
+  </div>
 </div>
 
 <div class="member-count" *ngIf="members && members.length > 0" style="display: flex; justify-content: space-between;">
