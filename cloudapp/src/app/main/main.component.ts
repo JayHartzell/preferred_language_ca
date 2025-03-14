@@ -114,11 +114,18 @@ export class MainComponent implements OnInit, OnDestroy {
   }
 
   clear() {
-    this.apiResult = null;
-    this.setEntities = [];
-    this.setID = '';
-    this.userDetails = [];
-    this.updateSummary = '';
+  // Clear all data and state
+  this.setID = '';
+  this.setMembers = []; 
+  this.userDetails = []; 
+  this.updateLog = [];
+  this.updateSummary = '';
+  this.apiResult = null;
+  this.setEntities = [];
+  
+  // Reset any other state variables you need
+  this.loading = false;
+  this.updating = false;
   }
 
   fetchSet(setID: string) {

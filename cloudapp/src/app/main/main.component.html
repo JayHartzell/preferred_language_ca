@@ -1,10 +1,22 @@
-<div class="eca-actions">
+<!-- Show Set ID input only when no data is loaded -->
+<div class="eca-actions" *ngIf="!members || members.length === 0">
   <input type="text" [(ngModel)]="setID" placeholder="Enter Set ID" />
   <button mat-flat-button color="primary" (click)="fetchSet(setID)">Retrieve Set Members</button>
 </div>
 
-<!-- Add update button when users are loaded -->
-<div class="eca-actions" *ngIf="users && users.length > 0 && !loading" style="display: flex; flex-direction: column; gap: 10px;">
+<!-- Show Reset button when data is loaded -->
+<div class="eca-actions" *ngIf="members && members.length > 0" style="display: flex; justify-content: space-between; align-items: center;">
+  <!-- Left side: Current Set ID -->
+  <span class="current-set">Current Set ID: {{ setID }}</span>
+  
+  <!-- Right side: Reset button -->
+  <button mat-stroked-button color="warn" (click)="clear()" [disabled]="updating">
+    <mat-icon>refresh</mat-icon> Reset
+  </button>
+</div>
+
+<!-- Add update button when users are loaded BUT no updates have been made yet -->
+<div class="eca-actions" *ngIf="users && users.length > 0 && !loading && !updateSummary" style="display: flex; flex-direction: column; gap: 10px;">
   <div>
     <label for="language-select" style="display: block; margin-bottom: 5px; font-weight: bold;">Select Language:</label>
     <select id="language-select" [(ngModel)]="selectedLanguage" style="width: 300px; max-width: 100%;">
@@ -19,6 +31,7 @@
   </div>
 </div>
 
+<!-- Show update summary when updates have been made -->
 <div class="member-count" *ngIf="members && members.length > 0" style="display: flex; justify-content: space-between;">
   <span>Total set members: {{ members.length }}</span>
   <span *ngIf="updateSummary" class="update-summary">
