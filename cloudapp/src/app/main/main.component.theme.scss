@@ -1,6 +1,6 @@
 @use '@angular/material' as mat;
 
-@mixin main-component-theme($theme, $typgraphy) {
+@mixin main-component-theme($theme, $typography) {
   div.highlight {
     border: mat.get-theme-color($theme, primary) solid 2px;
     color: mat.get-theme-color($theme, on-primary-container);
@@ -9,3 +9,115 @@
     font-weight: bolder;
   }
 }
+
+@mixin theming-component-theme($theme, $typography) {
+  // Heading styles
+  h2, h3 {
+    margin-bottom: 15px;
+    
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+  
+  // Theme colors for different headings
+  section {
+    h2 {
+      color: mat.get-theme-color($theme, primary);
+    }
+    
+    &:nth-child(even) h2 {
+      color: mat.get-theme-color($theme, secondary);
+    }
+  }
+  
+  // Basic card styling
+  .minimal-card {
+    border-left: 3px solid mat.get-theme-color($theme, outline);
+    background-color: mat.get-theme-color($theme, surface);
+    
+    &.has-success {
+      border-left-color: mat.get-theme-color($theme, primary);
+    }
+    
+    &.has-error {
+      border-left-color: mat.get-theme-color($theme, error);
+    }
+    
+    // Status messages
+    .status {
+      &.success {
+        background-color: mat.get-theme-color($theme, primary-container);
+        color: mat.get-theme-color($theme, on-primary-container);
+      }
+      
+      &.error {
+        background-color: mat.get-theme-color($theme, error-container);
+        color: mat.get-theme-color($theme, on-error-container);
+      }
+    }
+    
+    // Highlight for updated language
+    .language-info {
+      .highlight {
+        background-color: mat.get-theme-color($theme, secondary-container);
+        color: mat.get-theme-color($theme, on-secondary-container);
+      }
+    }
+  }
+  .member-count .update-summary .copy-button.mat-stroked-button {
+    color: mat.get-theme-color($theme, primary);
+    border-color: mat.get-theme-color($theme, outline);
+    background-color: transparent;
+    
+    &:hover {
+      background-color: mat.get-theme-color($theme, secondary-container);
+      color: mat.get-theme-color($theme, on-secondary-container) ;
+    }
+    
+    .mat-icon {
+      color: inherit;
+      margin-right: 4px;
+      vertical-align: middle;
+    }
+  }
+}
+  // Member count container styling
+  .member-count {
+    background-color: mat.get-theme-color($theme, surface-variant);
+    border: 1px solid mat.get-theme-color($theme, outline-variant);
+    border-radius: 4px;
+    padding: 10px 16px;
+    margin: 20px 0;
+    
+    // Total members styling
+    > span:first-child {
+      color: mat.get-theme-color($theme, on-surface-variant);
+      font-weight: 500;
+    }
+    
+    // Update summary styling
+    .update-summary {
+      color: mat.get-theme-color($theme, primary);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+  }
+  
+  // Explicitly target the copy button
+  .copy-button.mat-stroked-button {
+    color: mat.get-theme-color($theme, primary);
+    border-color: mat.get-theme-color($theme, outline);
+    
+    &:hover {
+      background-color: mat.get-theme-color($theme, secondary-container) !important;
+      color: mat.get-theme-color($theme, on-secondary-container) !important;
+    }
+    
+    .uxf-icon {
+      margin-right: 6px;
+      color: inherit;
+    }
+    
+  }

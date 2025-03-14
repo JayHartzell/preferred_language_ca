@@ -4,6 +4,7 @@
   margin: 15px 0;
 }
 
+// Basic layout styles
 textarea {
   padding: 2px;
   border-width: 1px;
@@ -33,43 +34,41 @@ textarea {
   font-size: 0.9em;
 }
 
+// Empty list structural styles (colors moved to theme)
 #emptyList {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  color: #888;
   margin: 30px 0;
   text-align: center;
 }
 
+// Loading indicator
 .loading-indicator {
   display: flex;
   justify-content: center;
-  color: #666;
   margin: 20px 0;
 }
 
+// Error message structural styles (colors moved to theme)
+.error-message {
+  padding: 10px;
+  border-radius: 4px;
+}
+
 .user-card {
-  border: 1px solid #ddd;
+  border: 1px;
   border-radius: 4px;
   padding: 15px;
   margin-bottom: 15px;
-  background-color: #f9f9f9;
+
 }
 
 .user-card h3 {
   margin-top: 0;
-  color: #2c3e50;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px;
   padding-bottom: 8px;
-}
-
-.error-message {
-  color: #e74c3c;
-  padding: 10px;
-  background-color: #fadbd8;
-  border-radius: 4px;
 }
 
 .user-details p {
@@ -82,25 +81,23 @@ details {
 
 summary {
   cursor: pointer;
-  color: #3498db;
 }
 
 details pre {
-  background-color: #f1f1f1;
   padding: 10px;
   border-radius: 4px;
   max-height: 300px;
   overflow: auto;
 }
 
+// Success message structural styles (colors moved to theme)
 .success-message {
-  color: #27ae60;
   padding: 10px;
-  background-color: #d5f5e3;
   border-radius: 4px;
   margin-bottom: 10px;
 }
 
+// Update summary
 .update-summary {
   margin-left: 15px;
   font-weight: bold;
@@ -109,22 +106,24 @@ details pre {
   gap: 10px;
 }
 
+// Highlight structural styles (colors moved to theme)
 .highlight {
-  background-color: #fff176;
   padding: 2px 5px;
   border-radius: 3px;
   animation: fadeBackground 2s ease-out;
 }
 
+// Animation keyframes (colors moved to theme)
 @keyframes fadeBackground {
   from {
-    background-color: #fff176;
+    opacity: 1;
   }
   to {
-    background-color: transparent;
+    opacity: 0.3;
   }
 }
 
+// Language selection
 .language-selection {
   display: inline-flex;
   align-items: center;
@@ -139,66 +138,68 @@ details pre {
 .language-selection select {
   padding: 6px;
   border-radius: 4px;
-  border: 1px solid #ccc;
+  border-width: 1px;
 }
 
+// Member count
 .member-count {
   margin-top: 10px;
   font-weight: bold;
-  color: #2980b9;
 }
 
-.update-log-section {
-  margin-top: 30px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  padding: 10px;
+:host ::ng-deep {
+  .copy-button.mat-stroked-button {
+    background-color: transparent;
+    }
+  }
+
+// Minimalist card styles - grid layout
+.minimalist-user-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 15px;
 }
 
-.update-log-table {
-  th, td {
-    padding: 8px;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
-  }
-  
-  th {
-    background-color: #f2f2f2;
-  }
-  
-  .success-row {
-    background-color: rgba(0, 128, 0, 0.1);
-  }
-  
-  .error-row {
-    background-color: rgba(255, 0, 0, 0.1);
-  }
-}
-
-.export-button {
-  background-color: #4CAF50;
-  color: white;
-  padding: 6px 12px;
-  border: none;
+// Card structural styles (colors moved to theme)
+.minimal-card {
+  padding: 12px;
   border-radius: 4px;
-  cursor: pointer;
+  transition: all 0.2s ease;
   
   &:hover {
-    background-color: #45a049;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
   }
-}
-
-.copy-button {
-  background-color: #3498db;
-  color: white;
-  padding: 4px 8px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.9em;
-  margin-left: 10px;
   
-  &:hover {
-    background-color: #2980b9;
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 8px;
+    
+    .user-name {
+      font-weight: 500;
+      font-size: 16px;
+    }
+    
+    .user-id {
+      font-size: 12px;
+    }
+  }
+  
+  .status {
+    font-size: 13px;
+    padding: 4px 8px;
+    border-radius: 3px;
+    margin-bottom: 8px;
+  }
+  
+  .language-info {
+    font-size: 14px;
+    
+    .highlight {
+      font-weight: 500;
+      padding: 2px 4px;
+      border-radius: 2px;
+    }
   }
 }

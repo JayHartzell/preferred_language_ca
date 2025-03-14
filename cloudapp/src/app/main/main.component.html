@@ -1,6 +1,6 @@
 <div class="eca-actions">
   <input type="text" [(ngModel)]="setID" placeholder="Enter Set ID" />
-  <button (click)="fetchSet(setID)"> Retrieve Set Members</button>
+  <button mat-flat-button color="primary" (click)="fetchSet(setID)">Retrieve Set Members</button>
 </div>
 
 <!-- Add update button when users are loaded -->
@@ -13,7 +13,7 @@
   </div>
   
   <div>
-    <button (click)="bulkUpdateLanguage()" [disabled]="updating" style="margin-top: 5px;">
+    <button mat-flat-button color="primary" (click)="bulkUpdateLanguage()" [disabled]="updating" style="margin-top: 5px;">
       Update All to {{ selectedLanguage.desc }}
     </button>
   </div>
@@ -24,53 +24,44 @@
   <span *ngIf="updateSummary" class="update-summary">
     {{ updateSummary }}
     <!-- Only show button if there's been an update and we have log entries -->
-    <button *ngIf="updateLog && updateLog.length > 0 && updateSummary" (click)="copyLogToClipboard()" class="copy-button">
-      <i class="uxf-icon uxf-copy"></i> Copy Results to Clipboard
+    <button eca-button mat-stroked-button color="primary" *ngIf="updateLog && updateLog.length > 0 && updateSummary" (click)="copyLogToClipboard()" class="copy-button">
+      <mat-icon style="margin-right: 4px; vertical-align: middle; font-size: 18px; height: 18px; width: 18px; line-height: 18px;">content_copy</mat-icon>
+      <span>Copy Results</span>
     </button>
   </span>
 </div>
 
 <div>
-  <!-- Show user details when available -->
-  <section *ngIf="users && users.length > 0" style="margin-top: 50px;">
-    <h2 style="color: green">User Details</h2>
-    <div *ngFor="let user of users" class="user-card">
-      <h3>{{ user.full_name || user.first_name + ' ' + user.last_name || 'User ' + user.id }}</h3>
-      
-      <!-- Show error if there was an error fetching this user -->
-      <div *ngIf="user.error" class="error-message">
-        {{ user.error }}
+<!-- Show user details when available -->
+<section *ngIf="users && users.length > 0" style="margin-top: 30px;">
+  <h2>User Details</h2>
+  
+  <div class="minimalist-user-cards">
+    <div *ngFor="let user of users" class="minimal-card" [class.has-error]="user.error" [class.has-success]="user.updateStatus === 'success'">
+      <!-- User name and ID in header -->
+      <div class="card-header">
+        <span class="user-name">{{ user.full_name || user.first_name + ' ' + user.last_name || 'User ' + user.id }}</span>
+        <span class="user-id">ID: {{ user.primary_id }}</span>
       </div>
       
-      <!-- Show update status if available -->
-      <div *ngIf="user.updateStatus" [ngClass]="user.updateStatus === 'success' ? 'success-message' : 'error-message'">
-        {{ user.updateStatus === 'success' ? 'Language updated to ' + selectedLanguage.desc + '!' : 'Failed to update language: ' + user.updateError }}
+      <!-- Status area - either error or update status -->
+      <div *ngIf="user.error" class="status error">{{ user.error }}</div>
+      <div *ngIf="user.updateStatus" class="status" [ngClass]="user.updateStatus === 'success' ? 'success' : 'error'">
+        {{ user.updateStatus === 'success' ? 'Updated to ' + selectedLanguage.desc : user.updateError }}
       </div>
       
-      <!-- Show user details if available -->
-      <div *ngIf="!user.error" class="user-details">
-        <p><strong>ID:</strong> {{ user.primary_id }}</p>
-        <p><strong>Preferred Language:</strong> 
-          <span [class.highlight]="user.updateStatus === 'success'">
-            {{ user.preferred_language?.desc || 'N/A' }}
-          </span>
-        </p>
-        
-        <!-- Expandable section for user details -->
-        <details>
-          <summary>User details</summary>
-          <p><strong>Status:</strong> {{ user.status?.desc }}</p>
-          <p><strong>User Group:</strong> {{ user.user_group?.desc || 'N/A' }}</p>
-          <p><strong>Account Type:</strong> {{ user.account_type?.desc || 'N/A' }}</p>
-          <pre>{{ user | json }}</pre>
-        </details>
+      <!-- Language info - only shown if no error -->
+      <div *ngIf="!user.error" class="language-info">
+        <span>Language: </span>
+        <span [class.highlight]="user.updateStatus === 'success'">{{ user.preferred_language?.desc || 'N/A' }}</span>
       </div>
     </div>
-  </section>
-  
+  </div>
+</section>
+
   <!-- Show basic set member info -->
   <section *ngIf="members && members.length > 0 && (!users || users.length === 0)" style="margin-top: 50px;">
-    <h2 style="color: blue">Set Members</h2>
+    <h2>Set Members</h2>
     <ul style="padding: 10px">
       <li style="margin: 5px 0" *ngFor="let member of members">
         <strong>Name:</strong> {{ member.name }} | 
