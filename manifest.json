@@ -1,7 +1,11 @@
 {
    "id": "preferred-language-utility",
    "title": "Preferred Language Updater",
-   "subtitle": "User preferred language bulk update utility (beta)",
+   "subtitle": "User preferred language bulk update utility",
    "author": "jay hartzell",
-   "description": "This utility takes in a set of users and updates their preferred language to a specified value."
+   "description": "This utility takes in a set of users and updates their preferred language to a specified value.",
+   "icon": {
+      "type": "url",
+      "value": "/assets/icon_codes.png"
+   }
 }
