@@ -8,7 +8,7 @@
 <div class="eca-actions" *ngIf="members && members.length > 0" style="display: flex; justify-content: space-between; align-items: center;">
   <!-- Left side: Current Set ID -->
   <span class="current-set">Current Set ID: {{ setID }}</span>
-  
+  <span class="member-count">Total set members: {{ members.length }}</span>
   <!-- Right side: Reset button -->
   <button mat-stroked-button color="warn" (click)="clear()" [disabled]="updating">
     <mat-icon>refresh</mat-icon> Reset
@@ -32,8 +32,7 @@
 </div>
 
 <!-- Show update summary when updates have been made -->
-<div class="member-count" *ngIf="members && members.length > 0" style="display: flex; justify-content: space-between;">
-  <span>Total set members: {{ members.length }}</span>
+<div class="member-count" *ngIf="users && users.length > 0 && !loading && updateSummary" style="display: flex; justify-content: space-between;">
   <span *ngIf="updateSummary" class="update-summary">
     {{ updateSummary }}
     <!-- Only show button if there's been an update and we have log entries -->

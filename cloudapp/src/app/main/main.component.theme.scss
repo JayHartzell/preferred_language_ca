@@ -65,23 +65,7 @@
       }
     }
   }
-  .member-count .update-summary .copy-button.mat-stroked-button {
-    color: mat.get-theme-color($theme, primary);
-    border-color: mat.get-theme-color($theme, outline);
-    background-color: transparent;
-    
-    &:hover {
-      background-color: mat.get-theme-color($theme, secondary-container);
-      color: mat.get-theme-color($theme, on-secondary-container) ;
-    }
-    
-    .mat-icon {
-      color: inherit;
-      margin-right: 4px;
-      vertical-align: middle;
-    }
-  }
-}
+
   // Member count container styling
   .member-count {
     background-color: mat.get-theme-color($theme, surface-variant);
@@ -103,6 +87,7 @@
       align-items: center;
       gap: 12px;
     }
+
   }
   
   // Explicitly target the copy button
@@ -119,5 +104,5 @@
       margin-right: 6px;
       color: inherit;
     }
-    
-  }
+  }} 
+
