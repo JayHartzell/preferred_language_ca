@@ -17,9 +17,7 @@ This app allows you to retrieve sets of users and update their preferred languag
 
 ### Exporting Results
 If you need to document the changes made:
-1. After performing updates, a "Copy Results to Clipboard" button will appear.
-2. Click this button to copy a formatted report of all changes to your clipboard.
-3. Paste the results into any document or spreadsheet for record-keeping.
+1. After performing updates, the user will be given the option of exporting a log file in CSV format.
 
 
 ### Resources

@@ -352,13 +352,21 @@ export class MainComponent implements OnInit, OnDestroy {
     // export headers
     const header = ['User ID', 'Status', 'Language', 'Timestamp'];
     
+    function escapeCsvValue(value: any): string {
+      const stringValue = String(value);
+      // If value contains commas, quotes, or newlines, wrap in quotes and escape internal quotes
+      if (/[",\n\r]/.test(stringValue)) {
+        return `"${stringValue.replace(/"/g, '""')}"`;
+      }
+      return stringValue;
+    }
     // Prepare csv rows
     const rows = this.updateLog.map(entry => [
-      entry.userId,
-      entry.status,
-      entry.language,
-      new Date(entry.timestamp).toLocaleString()
-    ]);
+    escapeCsvValue(entry.userId),
+    escapeCsvValue(entry.status),
+    escapeCsvValue(entry.language),
+    escapeCsvValue(new Date(entry.timestamp).toLocaleString())
+  ]);
     
     // Create CSV 
     const csvContent = [
@@ -371,7 +379,7 @@ export class MainComponent implements OnInit, OnDestroy {
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'language_updates.csv';
+    a.download = this.setID ? `language_updates_set_${this.setID}.csv` : 'language_updates.csv';
     a.click();
     
     // Clean up
