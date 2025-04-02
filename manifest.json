@@ -7,5 +7,10 @@
    "icon": {
       "type": "url",
       "value": "/assets/icon_codes.png"
+   },
+   "contentSecurity": {
+      "sandbox": {
+         "downloads": true
+      }
    }
 }

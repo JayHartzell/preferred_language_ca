@@ -348,11 +348,11 @@ export class MainComponent implements OnInit, OnDestroy {
     });
   }
 
-  copyLogToClipboard() {
-    // Ensure we're only copying necessary data
+  exportToCsv() {
+    // export headers
     const header = ['User ID', 'Status', 'Language', 'Timestamp'];
     
-    // Limit the data exposed in clipboard copy
+    // Prepare csv rows
     const rows = this.updateLog.map(entry => [
       entry.userId,
       entry.status,
@@ -360,20 +360,23 @@ export class MainComponent implements OnInit, OnDestroy {
       new Date(entry.timestamp).toLocaleString()
     ]);
     
-    // Combine header and rows
+    // Create CSV 
     const csvContent = [
-      header.join('\t'),
-      ...rows.map(row => row.join('\t'))
+      header.join(','),
+      ...rows.map(row => row.join(','))
     ].join('\n');
     
-    // Copy to clipboard
-    navigator.clipboard.writeText(csvContent)
-      .then(() => {
-        this.alert.success('Update log copied to clipboard!');
-      })
-      .catch(err => {
-        this.alert.error('Failed to copy to clipboard.');
-      });
+    // Create file and trigger download
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'language_updates.csv';
+    a.click();
+    
+    // Clean up
+    window.URL.revokeObjectURL(url);
+    this.alert.success('CSV file downloaded!');
   }
 
   // Input validation helper 

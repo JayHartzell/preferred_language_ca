@@ -10,9 +10,7 @@
   <span class="current-set">Current Set ID: {{ setID }}</span>
   <span class="member-count">Total set members: {{ members.length }}</span>
   <!-- Right side: Reset button -->
-  <button mat-stroked-button color="warn" (click)="clear()" [disabled]="updating">
-    <mat-icon>refresh</mat-icon> Reset
-  </button>
+  <button mat-stroked-button color="warn" (click)="clear()" [disabled]="updating"> Reset </button>
 </div>
 
 <!-- Add update button when users are loaded BUT no updates have been made yet -->
@@ -36,9 +34,9 @@
   <span *ngIf="updateSummary" class="update-summary">
     {{ updateSummary }}
     <!-- Only show button if there's been an update and we have log entries -->
-    <button eca-button mat-stroked-button color="primary" *ngIf="updateLog && updateLog.length > 0 && updateSummary" (click)="copyLogToClipboard()" class="copy-button">
-      <mat-icon style="margin-right: 4px; vertical-align: middle; font-size: 18px; height: 18px; width: 18px; line-height: 18px;">content_copy</mat-icon>
-      <span>Copy Results</span>
+    <button eca-button mat-stroked-button color="primary" *ngIf="updateLog && updateLog.length > 0 && updateSummary" (click)="exportToCsv()" class="copy-button">
+      <mat-icon style="margin-right: 4px; vertical-align: right; font-size: 18px; height: 18px; width: 18px; line-height: 18px;">download</mat-icon>
+      <span>Download CSV</span>
     </button>
   </span>
 </div>
