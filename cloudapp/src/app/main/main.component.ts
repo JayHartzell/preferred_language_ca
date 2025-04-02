@@ -9,7 +9,7 @@ import {
 } from '@exlibris/exl-cloudapp-angular-lib';
 import { forkJoin, Observable, of, Subscription } from 'rxjs';
 import { finalize, tap, catchError } from 'rxjs/operators';
-import { DomSanitizer } from '@angular/platform-browser';
+
 
 interface LogEntry {
   userId: string;
@@ -91,9 +91,7 @@ export class MainComponent implements OnInit, OnDestroy {
   constructor(
     private restService: CloudAppRestService,
     private eventsService: CloudAppEventsService,
-    private alert: AlertService,
-    private sanitizer: DomSanitizer
-  ) {
+    private alert: AlertService  ) {
     this.entities$ = this.eventsService.entities$.pipe(tap(() => this.clear()));
   }
 
@@ -387,14 +385,13 @@ export class MainComponent implements OnInit, OnDestroy {
     this.alert.success('CSV file downloaded!');
   }
 
-  // Input validation helper 
+
   private isValidSetId(id: string): boolean {
     // validation for numeric set IDs 
     return /^\d{12,18}$/.test(id);
   }
-  
-  // Basic sanitization
-  // Comprehensive sanitization
+
+
   private sanitizeInput(input: string): string {
     // Trim the input and remove special characters
     return input.trim().replace(/[^a-zA-Z0-9]/g, '');
